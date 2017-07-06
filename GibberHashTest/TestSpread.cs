@@ -21,7 +21,7 @@ namespace GibberHashTest
             return checksum & 0xFF;
         }
 
-        private const int MaxTestValue = 40;// ushort.MaxValue;
+        private const int MaxTestValue = ushort.MaxValue * 16;
         private Dictionary<string, List<int>> _spreadDictionary = new Dictionary<string, List<int>>(MaxTestValue);
 
         [TestMethod]
@@ -62,7 +62,7 @@ namespace GibberHashTest
             for (int i = 0 ; i < MaxTestValue ; i++)
             {
                 gibberHash = i.ToGibberHash();
-                System.Diagnostics.Debug.WriteLine(gibberHash);
+                if(i > 16352 && i < 16586) System.Diagnostics.Debug.WriteLine(gibberHash);
                 if (_spreadDictionary.ContainsKey(gibberHash))
                     _spreadDictionary[gibberHash].Add(i);
                 else

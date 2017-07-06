@@ -40,9 +40,11 @@ namespace Jongbloed.Experiments
         //        showBits(test).Dump();
         //    }
         //}
-        private static ulong takeNextBits(ref uint number, byte amount)
+        private static uint takeNextBits(ref uint number, byte amount)
         {
-            ulong result = (ulong)(number & ((1 << amount) - 1));
+            uint mask = ((1U << amount) - 1U);
+            //showBits(mask).Dump();
+            uint result = (number & mask);
             wrapShiftRight(ref number, amount);
             return result;
         }
@@ -115,104 +117,35 @@ namespace Jongbloed.Experiments
         {
             uint scrambled = mirrorOddBits(Convert.ToUInt32(number));
 
-            return new[] { 0, 4, 8, 12, 16, 0, 20, 24, 28 }.Select(shift => (byte)((scrambled >> shift) & 0xF))
+            return
+            Enumerable.Range(0,16)
+                .Select(n => takeNextBits(ref scrambled, 30))
+                .Select(uint25 => uint25 & 0xF)
+            /*return new[] { 0, 4, 8, 12, 16, 0, 20, 24, 28 }.Select(shift => (byte)((scrambled >> shift) & 0xF))*/
                 .Zip(new[]
                 {
                     TextType.WordStart,
                     TextType.ShortVowel,
                     TextType.SoftConsonant,
+                    TextType.LongVowel,
+                    TextType.WordEnd,
                     TextType.ShortVowel,
+                    TextType.Space,
+
+                    TextType.WordStart,
+                    TextType.ShortVowel,
+                    TextType.SoftConsonant,
+                    TextType.LongVowel,
                     TextType.WordEnd,
                     TextType.Space,
+
                     TextType.WordStart,
-                    TextType.LongVowel,
-                    TextType.SoftConsonant,
+                    TextType.ShortVowel,
                     TextType.WordEnd
-                }, (halfByte, textType) => syllables[(int)textType, halfByte])
+                }, 
+                (uint4, syll) => syllables[(int)syll, uint4])
                 .Aggregate(new StringBuilder(), (sb, syll) => sb.Append(syll))
                 .ToString();
         }
-        //public static string ToGibberHash(this uint number)
-        //{
-        //    uint shiftOrderBase = ~number;
-        //    wrapShiftRight(ref shiftOrderBase, (byte)(((number ^ 0x65) + ((number ^ 0x6500) >> 8) + ((number ^ 0x650000) >> 16) + ((number ^ 0x65000000) >> 24)) ));
-
-        //    var type_index = new[] { 0, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28 }
-        //        .Select(shift => Tuple.Create((byte)takeNextBits(ref shiftOrderBase, (byte)((shiftOrderBase & 0x7) + 1)), (byte)takeNextBits(ref shiftOrderBase, 3), (byte)((number >> shift) & 0xF)))
-        //        .OrderBy(order_type_index => order_type_index.Item1)
-        //        .Select(order_type_index => new { type = order_type_index.Item2, index = order_type_index.Item3 }).ToArray();
-
-        //    var sb = new StringBuilder();
-        //    TextType lastType = TextType.WordStart;
-        //    for (int i = 0 ; i < type_index.Length ; i++)
-        //    {
-        //        var ti = type_index[i];
-
-        //        switch (lastType)
-        //        {
-        //        case TextType.WordStart:
-        //            if (i + 1 < type_index.Length)
-        //                sb.Append(starts[ti.index]);
-        //            break;
-        //        case TextType.ShortVowel:
-        //            sb.Append(shorts[ti.index]);
-        //            break;
-        //        case TextType.LongVowel:
-        //            sb.Append(longs[ti.index]);
-        //            break;
-        //        case TextType.SoftConsonant:
-        //            sb.Append(soft[ti.index]);
-        //            break;
-        //        case TextType.WordEnd:
-        //            sb.Append(ends[ti.index]).Append(' ');
-        //            break;
-        //        case TextType.Space:
-        //            sb.Append(' ');
-        //            break;
-        //        }
-        //        switch (lastType)
-        //        {
-        //        case TextType.WordStart:
-        //            if ((ti.type & 1) > 0)
-        //                lastType = TextType.LongVowel;
-        //            else
-        //                lastType = TextType.ShortVowel;
-        //            break;
-        //        case TextType.ShortVowel:
-        //            if ((ti.type & 2) > 0)
-        //            {
-        //                if ((ti.type & 1) > 0)
-        //                    lastType = TextType.WordEnd;
-        //                else
-        //                    lastType = TextType.SoftConsonant;
-        //            }
-        //            else
-        //            {
-        //                if ((ti.type & 1) > 0)
-        //                    lastType = TextType.Space;
-        //                else
-        //                    lastType = TextType.WordEnd;
-        //            }
-        //            break;
-        //        case TextType.LongVowel:
-        //            if ((ti.type & 1) > 0)
-        //                lastType = TextType.SoftConsonant;
-        //            else
-        //                lastType = TextType.WordEnd;
-        //            break;
-        //        case TextType.SoftConsonant:
-        //            if ((ti.type & 1) > 0)
-        //                lastType = TextType.WordEnd;
-        //            else
-        //                lastType = TextType.ShortVowel;
-        //            break;
-        //        case TextType.WordEnd:
-        //        case TextType.Space:
-        //            lastType = TextType.WordStart;
-        //            break;
-        //        }
-        //    }
-        //    return sb.ToString().TrimEnd();
-        //}
     }
 }
