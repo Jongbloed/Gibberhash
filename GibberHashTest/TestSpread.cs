@@ -25,6 +25,22 @@ namespace GibberHashTest
         private Dictionary<string, List<int>> _spreadDictionary = new Dictionary<string, List<int>>(MaxTestValue);
 
         [TestMethod]
+        public void Does_Not_Crash_On_Arbitrary_UInt_Value()
+        {
+            Random rand = new Random();
+            string gibberHash;
+
+            for(int i = 0 ; i < 100 ; i++)
+            {
+                int sample = rand.Next();
+                if ((rand.Next() & 1) == 1)
+                    sample = -sample;
+
+                gibberHash = sample.ToGibberHash();
+                System.Diagnostics.Debug.WriteLine(gibberHash);
+            }
+        }
+        [TestMethod]
         public void Spread_NoMoreThanTwo()
         {
             _spreadDictionary.Clear();
@@ -62,7 +78,7 @@ namespace GibberHashTest
             for (int i = 0 ; i < MaxTestValue ; i++)
             {
                 gibberHash = i.ToGibberHash();
-                if(i > 16352 && i < 16586) System.Diagnostics.Debug.WriteLine(gibberHash);
+                //if(i > 16352 && i < 16586) System.Diagnostics.Debug.WriteLine(gibberHash);
                 if (_spreadDictionary.ContainsKey(gibberHash))
                     _spreadDictionary[gibberHash].Add(i);
                 else

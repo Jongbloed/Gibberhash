@@ -115,7 +115,7 @@ namespace Jongbloed.Experiments
         //}
         public static string ToGibberHash(this int number)
         {
-            uint scrambled = mirrorOddBits(Convert.ToUInt32(number));
+            uint scrambled = mirrorOddBits((uint)(number));
 
             return
             Enumerable.Range(0,16)
