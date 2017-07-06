@@ -28,12 +28,35 @@ namespace Jongbloed.Experiments
             amount %= 32;
             number = (uint)((number >> amount) | ((number & ((1 << amount) - 1)) << (32 - amount)));
         }
+        //void Main()
+        //{
+        //    uint test = (uint)new Random().Next();
+        //    showBits(test).Dump();
+
+        //    byte shift;
+        //    while ((shift = byte.Parse(Console.ReadLine())) > 0)
+        //    {
+        //        wrapShiftRight(ref test, shift);
+        //        showBits(test).Dump();
+        //    }
+        //}
         private static ulong takeNextBits(ref uint number, byte amount)
         {
             ulong result = (ulong)(number & ((1 << amount) - 1));
             wrapShiftRight(ref number, amount);
             return result;
         }
+        //void Main()
+        //{
+        //    uint test = (uint)new Random().Next();
+        //    showBits(test).Dump();
+
+        //    byte shift;
+        //    while ((shift = byte.Parse(Console.ReadLine())) > 0)
+        //    {
+        //        showBits(takeNextBits(ref test, shift)).Dump();
+        //    }
+        //}
         private static string showBits(uint number) =>
             "32   28   24   20   16   12   8    4  1\n" +
             Enumerable.Range(0, sizeof(uint) * 8).Reverse()
