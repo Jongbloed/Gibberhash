@@ -1,12 +1,13 @@
 # Gibberhash
 
 
-I find it cumbersome to have to remember exactly what my customer number was at whichever company.
-
-And most hash functions do not help there.
-
-Enter GibberHash: turns a four byte integer number into a combination of syllables that may not make any sense, 
-but will be way easier to remember!
+> I find it cumbersome to have to remember exactly what my customer number was at whichever company,
+> or, more realistically, what some customer's id or session number was, so I know where to find or save his files.
+> 
+> And most hash functions do not help there.
+> 
+> Enter GibberHash: turns a four byte integer number into a combination of syllables that may not make any sense, 
+> but will be way easier to remember!
 
 I have not come across a collision yet, although I've only tested through a range of 0 through 1229782938247303440.
 
