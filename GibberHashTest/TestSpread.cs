@@ -21,23 +21,23 @@ namespace GibberHashTest
             return checksum & 0xFF;
         }
 
-        private const int MaxTestValue = ushort.MaxValue;
-        private Dictionary<string, List<uint>> _spreadDictionary = new Dictionary<string, List<uint>>(MaxTestValue);
+        private const int MaxTestValue = 40;// ushort.MaxValue;
+        private Dictionary<string, List<int>> _spreadDictionary = new Dictionary<string, List<int>>(MaxTestValue);
 
         [TestMethod]
         public void Spread_NoMoreThanTwo()
         {
             _spreadDictionary.Clear();
             string gibberHash;
-            for(uint i = 0 ; i < MaxTestValue ; i++)
+            for(int i = 0 ; i < MaxTestValue ; i++)
             {
                 gibberHash = i.ToGibberHash();
                 if (_spreadDictionary.ContainsKey(gibberHash))
-                    _spreadDictionary[gibberHash] = Tuple.Create(_spreadDictionary[gibberHash].Item1, _spreadDictionary[gibberHash].Item2+1);
+                    _spreadDictionary[gibberHash].Add(i);
                 else
-                    _spreadDictionary.Add(gibberHash, Tuple.Create(i, 1));
+                    _spreadDictionary.Add(gibberHash, new List<int> { i });
             }
-            int maxSpread = _spreadDictionary.Max(kvp => kvp.Value.Item2);
+            int maxSpread = _spreadDictionary.Max(kvp => kvp.Value.Count);
             Assert.IsTrue(maxSpread <= 2);
         }
         [TestMethod]
@@ -46,32 +46,33 @@ namespace GibberHashTest
             _spreadDictionary.Clear();
             string md5Hash;
             using(var md5 = System.Security.Cryptography.MD5.Create())
-                for (uint i = 0 ; i < MaxTestValue ; i++)
+                for (int i = 0 ; i < MaxTestValue ; i++)
                 {
                     md5Hash = BitConverter.ToString(md5.ComputeHash(new []{ (byte)(i), (byte)(i>>8), (byte)(i>>16), (byte)(i>>24), })).Replace("-", "");
 
                     if (_spreadDictionary.ContainsKey(md5Hash))
-                        _spreadDictionary[md5Hash] = Tuple.Create(_spreadDictionary[md5Hash].Item1, _spreadDictionary[md5Hash].Item2 + 1);
+                        _spreadDictionary[md5Hash].Add(i);
                     else
-                        _spreadDictionary.Add(md5Hash, Tuple.Create(i, 1));
+                        _spreadDictionary.Add(md5Hash, new List<int> { i });
                 }
-            int md5MaxSpread = _spreadDictionary.Max(kvp => kvp.Value.Item2);
+            int md5MaxSpread = _spreadDictionary.Max(kvp => kvp.Value.Count);
 
             _spreadDictionary.Clear();
             string gibberHash;
-            for (uint i = 0 ; i < MaxTestValue ; i++)
+            for (int i = 0 ; i < MaxTestValue ; i++)
             {
-                gibberHash = ((uint)i).ToGibberHash();
+                gibberHash = i.ToGibberHash();
+                System.Diagnostics.Debug.WriteLine(gibberHash);
                 if (_spreadDictionary.ContainsKey(gibberHash))
-                    _spreadDictionary[gibberHash] = Tuple.Create(_spreadDictionary[gibberHash].Item1, _spreadDictionary[gibberHash].Item2 + 1);
+                    _spreadDictionary[gibberHash].Add(i);
                 else
-                    _spreadDictionary.Add(gibberHash, Tuple.Create(i, 1));
+                    _spreadDictionary.Add(gibberHash, new List<int> { i });
             }
-            int gibberishSpread = _spreadDictionary.Max(kvp => kvp.Value.Item2);
+            int gibberishSpread = _spreadDictionary.Max(kvp => kvp.Value.Count);
 
-            string duplications = String.Join("\n", _spreadDictionary.Where(kvp => kvp.Value.Item2 == 2).Select(kvp => $"{kvp.Value.Item1} => {kvp.Key}"));
-            string triplications = String.Join("\n", _spreadDictionary.Where(kvp => kvp.Value.Item2 == 3).Select(kvp => $"{kvp.Value.Item1} => {kvp.Key}"));
-            string quadruplications = String.Join("\n", _spreadDictionary.Where(kvp => kvp.Value.Item2 == 4).Select(kvp => $"{kvp.Value.Item1} => {kvp.Key}"));
+            string duplications = String.Join("\n", _spreadDictionary.Where(kvp => kvp.Value.Count == 2).Select(kvp => $"({String.Join(", ", kvp.Value)}) => {kvp.Key}"));
+            string triplications = String.Join("\n", _spreadDictionary.Where(kvp => kvp.Value.Count == 3).Select(kvp => $"({String.Join(", ", kvp.Value)}) => {kvp.Key}"));
+            string quadruplications = String.Join("\n", _spreadDictionary.Where(kvp => kvp.Value.Count == 4).Select(kvp => $"({String.Join(", ", kvp.Value)}) => {kvp.Key}"));
             Assert.IsTrue(gibberishSpread <= md5MaxSpread);
             Assert.IsTrue(duplications.Length == 0);
             Assert.IsTrue(triplications.Length == 0);
@@ -82,28 +83,28 @@ namespace GibberHashTest
         {
             _spreadDictionary.Clear();
             string checksum;
-            for (uint i = 0 ; i < MaxTestValue ; i++)
+            for (int i = 0 ; i < MaxTestValue ; i++)
             {
                 checksum = Checksum(i.ToString()).ToString();
 
                 if (_spreadDictionary.ContainsKey(checksum))
-                    _spreadDictionary[checksum] = Tuple.Create(_spreadDictionary[checksum].Item1, _spreadDictionary[checksum].Item2 + 1);
+                    _spreadDictionary[checksum].Add(i);
                 else
-                    _spreadDictionary.Add(checksum, Tuple.Create(i, 1));
+                    _spreadDictionary.Add(checksum, new List<int> { i });
             }
-            int chksMaxSpread = _spreadDictionary.Max(kvp => kvp.Value.Item2);
+            int chksMaxSpread = _spreadDictionary.Max(kvp => kvp.Value.Count);
 
             _spreadDictionary.Clear();
             string gibberHash;
-            for (uint i = 0 ; i < MaxTestValue ; i++)
+            for (int i = 0 ; i < MaxTestValue ; i++)
             {
-                gibberHash = ((uint)i).ToGibberHash();
+                gibberHash = i.ToGibberHash();
                 if (_spreadDictionary.ContainsKey(gibberHash))
-                    _spreadDictionary[gibberHash] = Tuple.Create(_spreadDictionary[gibberHash].Item1, _spreadDictionary[gibberHash].Item2 + 1);
+                    _spreadDictionary[gibberHash].Add(i);
                 else
-                    _spreadDictionary.Add(gibberHash, Tuple.Create(i, 1));
+                    _spreadDictionary.Add(gibberHash, new List<int> { i });
             }
-            int gibberishSpread = _spreadDictionary.Max(kvp => kvp.Value.Item2);
+            int gibberishSpread = _spreadDictionary.Max(kvp => kvp.Value.Count);
             Assert.IsTrue(gibberishSpread <= chksMaxSpread);
         }
     }
