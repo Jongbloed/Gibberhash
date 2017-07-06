@@ -30,14 +30,20 @@ namespace GibberHashTest
             Random rand = new Random();
             string gibberHash;
 
+            int sample = 0;
             for(int i = 0 ; i < 100 ; i++)
             {
-                int sample = rand.Next();
+                sample = rand.Next();
                 if ((rand.Next() & 1) == 1)
                     sample = -sample;
 
                 gibberHash = sample.ToGibberHash();
-                System.Diagnostics.Debug.WriteLine(gibberHash);
+                System.Diagnostics.Debug.WriteLine($"number: {sample} \t translates to: {gibberHash}");
+            }
+            for(int i = 0 ; i < 30 ; i ++)
+            {
+                gibberHash = (sample + i).ToGibberHash();
+                System.Diagnostics.Debug.WriteLine($"number: {(sample + i)} \t translates to: {gibberHash}");
             }
         }
         [TestMethod]
