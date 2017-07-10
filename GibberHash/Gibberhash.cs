@@ -19,7 +19,7 @@ namespace Jongbloed.Experiments
         private static string[,] syllables = { {  "S",  "M",  "P",    "W",  "R",   "T",    "S",  "D",   "F",   "G",   "H",  "K",   "L",   "V",   "B",    "N" },
                                                {  "o", "oe",  "e",    "a", "eh", "och",  "ach",  "i", "oeh",  "ou", "ugh", "uh",   "u",  "ie", "anj",   "im" },
                                                { "au", "oo", "aa",   "oe", "ou",  "eu",  "aai", "la",  "ei", "ooi",  "ij", "ee",  "ui",  "aï",   "y",   "eu" },
-                                               {"eng", "er",  "x",   "le", "dz",   "s",    "n",  "m",  "ls", "ala",   "h","ñer",  "sh", "ang",  "ks",    "t" },
+                                               {"eng", "er",  "w",   "le", "dz",   "s",    "n",  "m",  "ls", "ala",   "h","ñer",  "sh", "ang",  "ks",    "t" },
                                                { "we","der","tum",  "kum", "el",  "na",   "io", "le", "man", "ert", "ero", "ly","nter",  "er",  "ke",  "tel" } };
 
         private static void wrapShiftRight(ref uint number, byte amount)
