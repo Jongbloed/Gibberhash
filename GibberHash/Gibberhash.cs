@@ -17,11 +17,10 @@ namespace Jongbloed.Experiments
         }
 
         private static string[,] syllables = { {  "S",  "M",  "P",    "W",  "R",   "T",    "S",  "D",   "F",   "G",   "H",  "K",   "L",   "V",   "B",    "N" },
-                                               {  "o", "oe",  "e",    "a", "eh", "och",  "ach",  "i", "oeh",  "ou", "ugh", "uh",   "u",  "ie","isch", "ieuw" },
-                                               { "au", "oo", "aa",   "oe", "ou",  "eu",  "aai", "la",  "ei", "ooi",  "ij", "ee",  "ui",  "aï",   "y",  "eeu" },
-                                               { "ng", "er",  "x",    "l", "dz",   "s",    "n",  "m",  "ls", "cch",   "h",  "ñ",  "sh",   "g",  "ks",  "ter" },
-                                               { "we","der","tum","schap", "el","heid",   "io","sus",  "uw", "ert", "sch", "ly","nter",  "er","stra",  "tel" },
-                                               { " " , " " , " " ,   " " , " " ,  " " ,   " " , " " ,  " " ,  " " ,  " " , " " ,  " " ,  " " ,  " " ,    " " } };
+                                               {  "o", "oe",  "e",    "a", "eh", "och",  "ach",  "i", "oeh",  "ou", "ugh", "uh",   "u",  "ie", "anj",   "im" },
+                                               { "au", "oo", "aa",   "oe", "ou",  "eu",  "aai", "la",  "ei", "ooi",  "ij", "ee",  "ui",  "aï",   "y",   "eu" },
+                                               {"eng", "er",  "x",   "le", "dz",   "s",    "n",  "m",  "ls", "ala",   "h","ñer",  "sh", "ang",  "ks",    "t" },
+                                               { "we","der","tum",  "kum", "el",  "na",   "io", "le", "man", "ert", "ero", "ly","nter",  "er",  "ke",  "tel" } };
 
         private static void wrapShiftRight(ref uint number, byte amount)
         {
@@ -64,6 +63,7 @@ namespace Jongbloed.Experiments
             Enumerable.Range(0, sizeof(uint) * 8).Reverse()
                 .Aggregate(new StringBuilder(), (sb, i) => sb.Append(Convert.ToInt32((number & (1U << i)) > 0)).Append(i > 0 && (i) % 4 == 0 ? " " : ""))
                 .Append('\n').Append(number.ToString().PadLeft(39, ' ')).ToString();
+
         private static string visualizeBits(uint number) =>
             Enumerable.Range(0, sizeof(uint) * 8).Reverse()
                 .Aggregate(new StringBuilder($"{(sizeof(uint) * 8)} "),
@@ -117,35 +117,38 @@ namespace Jongbloed.Experiments
         {
             uint scrambled = mirrorOddBits((uint)(number));
 
-            return
-            Enumerable.Range(0,16)
-                .Select(n => takeNextBits(ref scrambled, 30))
-                .Select(uint25 => uint25 & 0xF)
-            /*return new[] { 0, 4, 8, 12, 16, 0, 20, 24, 28 }.Select(shift => (byte)((scrambled >> shift) & 0xF))*/
-                .Zip(new[]
-                {
-                    TextType.WordStart,
-                    TextType.ShortVowel,
-                    TextType.SoftConsonant,
-                    TextType.LongVowel,
-                    TextType.WordEnd,
-                    TextType.ShortVowel,
-                    TextType.Space,
+            Func<uint> nextIndex = () => takeNextBits(ref scrambled, 4) & 0xF;
 
-                    TextType.WordStart,
-                    TextType.ShortVowel,
-                    TextType.SoftConsonant,
-                    TextType.LongVowel,
-                    TextType.WordEnd,
-                    TextType.Space,
+            return new
+            [] {
+                TextType.WordStart,
+                TextType.ShortVowel,
+                TextType.SoftConsonant,
+                TextType.LongVowel,
 
-                    TextType.WordStart,
-                    TextType.ShortVowel,
-                    TextType.WordEnd
-                }, 
-                (uint4, syll) => syllables[(int)syll, uint4])
-                .Aggregate(new StringBuilder(), (sb, syll) => sb.Append(syll))
-                .ToString();
+                TextType.Space,
+
+                TextType.WordStart,
+                TextType.ShortVowel,
+                TextType.WordEnd,
+
+                TextType.Space,
+
+                TextType.WordStart,
+                TextType.ShortVowel,
+                TextType.SoftConsonant,
+                TextType.ShortVowel,
+                TextType.SoftConsonant,
+                TextType.ShortVowel,
+                TextType.SoftConsonant,
+                TextType.SoftConsonant,
+                TextType.LongVowel,
+            }
+            .Select(type => type == TextType.Space 
+                ? " " 
+                : syllables[(int)type, nextIndex()]) 
+            .Aggregate(new StringBuilder(), (sb, syll) => sb.Append(syll))
+            .ToString();
         }
     }
 }
