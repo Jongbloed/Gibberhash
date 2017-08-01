@@ -104,6 +104,19 @@ namespace Jongbloed.Experiments
             }
             return subject;
         }
+        private static uint shuffleWords(uint subject)
+        {
+            return
+            (((subject & 0x000000F0) << 4) |
+             ((subject & 0x00000F00) >> 4)) |
+            (((subject & 0x0000F000) << 4) |
+             ((subject & 0x000F0000) >> 4)) |
+            (((subject & 0x00F00000) << 4) |
+             ((subject & 0x0F000000) >> 4)) |
+
+             (subject & 0xF0000000) |
+             (subject & 0x0000000F);
+        }
         //void Main()
         //{
         //    uint test = 0x000000F0U;//(uint) new Random().Next();
@@ -115,7 +128,7 @@ namespace Jongbloed.Experiments
         //}
         public static string ToGibberHash(this int number)
         {
-            uint scrambled = mirrorOddBits((uint)(number));
+            uint scrambled = mirrorOddBits(shuffleWords((uint)(number)));
 
             Func<uint> nextIndex = () => takeNextBits(ref scrambled, 4) & 0xF;
 
@@ -141,8 +154,8 @@ namespace Jongbloed.Experiments
                 TextType.SoftConsonant,
                 TextType.ShortVowel,
                 TextType.SoftConsonant,
-                TextType.SoftConsonant,
                 TextType.LongVowel,
+                TextType.WordEnd
             }
             .Select(type => type == TextType.Space 
                 ? " " 
